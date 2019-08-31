@@ -8,15 +8,11 @@ from bs4 import BeautifulSoup
 import datetime
 import time
 
+CRED_PATH = "../secrets/credentials.txt"
 URL = "https://library-admin.anu.edu.au/book-a-library-group-study-room/index.html"
-UID = "u6048805"
-PASSWORD = ""
 
 BUILDINGS = ["Chifley", "Hancock", "Law", "Menzies"]
 DAYS_TO_SCAN = 11
-
-PARAMS_LOGIN = {"inp_uid": UID,
-                "inp_passwd": PASSWORD}
 
 PARAMS_BOOKINGS = {"ajax": 1,
                    "building": "Hancock",
@@ -24,13 +20,30 @@ PARAMS_BOOKINGS = {"ajax": 1,
                    "showBookingsForSelectedBuilding": 1}
 
 
-def createParamBookings(building, date):
-    params = {"ajax": 1,
-              "building": building,
-              "bday": date,
-              "showBookingsForSelectedBuilding": 1}
+# Read in the username and password from the secrets file
+def createParamLogin():
+    f = open(CRED_PATH, 'r')
 
-    return params
+    contents = ""
+    if f.mode == 'r':
+        contents = f.read()
+
+    split = contents.split(':')
+
+    loginParams = {"inp_uid": split[0],
+                   "inp_passwd": split[1]}
+
+    return loginParams
+
+
+# Create the booking params for a building and date
+def createParamBookings(building, date):
+    bookingParams = {"ajax": 1,
+                      "building": building,
+                      "bday": date,
+                      "showBookingsForSelectedBuilding": 1}
+
+    return bookingParams
 
 
 # Generate a list of dates in the format: YYYY-MM-DD
@@ -72,7 +85,7 @@ def cleanTimes(tList):
 
 if __name__ == "__main__":
     s = requests.Session()
-    s.post(URL, PARAMS_LOGIN)  # Log in
+    s.post(URL, createParamLogin())  # Log in
 
     # Loop through each building
     for b in BUILDINGS:
@@ -106,7 +119,6 @@ if __name__ == "__main__":
 
                 clean = cleanTimes(timeList)
                 print(clean)
-
 
 '''
 ajax	1
