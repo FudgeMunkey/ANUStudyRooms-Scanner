@@ -6,13 +6,15 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
-import time
+import json
+import pprint
+import os
 
 CRED_PATH = "../secrets/credentials.txt"
 URL = "https://library-admin.anu.edu.au/book-a-library-group-study-room/index.html"
 
 BUILDINGS = ["Chifley", "Hancock", "Law", "Menzies"]
-DAYS_TO_SCAN = 11
+DAYS_TO_SCAN = 2
 
 PARAMS_BOOKINGS = {"ajax": 1,
                    "building": "Hancock",
@@ -83,17 +85,46 @@ def cleanTimes(tList):
     return cleaned
 
 
+def outputToFile(out_dict):
+    BASE = "../scans/"
+    title = BASE + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+
+    out_dict["Scan_End"] = str(datetime.datetime.now())
+    out_json = json.dumps(out_dict)
+
+    try:
+        os.mkdir(BASE)
+        print("Folder created.")
+    except FileExistsError:
+        print("Folder already exists.")
+
+    f = open("{}.txt".format(title), "w")
+    f.write(out_json)
+
+    return
+
+
 if __name__ == "__main__":
+    # Create the output file
+    out = {}
+    out["Scan_Start"] = str(datetime.datetime.now())
+
+    # Create the session
     s = requests.Session()
     s.post(URL, createParamLogin())  # Log in
 
     # Loop through each building
     for b in BUILDINGS:
-        print("Building {}".format(b))
+        print("SCANNING Building {}".format(b))
+        out[b] = {}
         # Loop through each date
-        dates = generateDates(1)
+        dates = generateDates(DAYS_TO_SCAN)
+
+        dateDict = {}
         for d in dates:
-            print("Date {}".format(d))
+            # print("Date {}".format(d))
+            dateDict[d] = {}
+            
             # Generate the POST Parameters
             params = createParamBookings(b, d)
 
@@ -104,21 +135,25 @@ if __name__ == "__main__":
             soup = BeautifulSoup(r.content, 'html.parser')
             parentElements = soup.find_all(class_="hideboard")[:-1]
 
-            for s in parentElements:
+            for e in parentElements:
                 # Extract the room name
-                roomName = s.get('id').split('-')[0]
-                print(roomName)
+                roomName = e.get('id').split('-')[0]
+                # print(roomName)
 
                 # Extract the booked times
                 # Not available: <09:00 - 11:00>
-                timeElements = s.find_all(class_="xideboard")
+                timeElements = e.find_all(class_="xideboard")
                 timeList = []
                 for te in timeElements:
                     timeBlock = te.text.split(':', 1)[1][1:-1]
                     timeList.append(timeBlock)
 
                 clean = cleanTimes(timeList)
-                print(clean)
+                dateDict[d][roomName] = clean
+                # print(clean)
+        out[b] = dateDict
+    # pprint.pprint(out)
+    outputToFile(out)
 
 '''
 ajax	1
