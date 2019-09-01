@@ -7,7 +7,6 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import json
-import pprint
 import os
 
 CRED_PATH = "../secrets/credentials.txt"
@@ -24,7 +23,10 @@ PARAMS_BOOKINGS = {"ajax": 1,
 
 # Read in the username and password from the secrets file
 def createParamLogin():
-    f = open(CRED_PATH, 'r')
+    try:
+        f = open(CRED_PATH, 'r')
+    except FileNotFoundError:
+        print("Credentials not found, please create the file in root /secrets/credentials.txt with the format UID:PASSWORD")
 
     contents = ""
     if f.mode == 'r':
@@ -87,7 +89,8 @@ def cleanTimes(tList):
 
 def outputToFile(out_dict):
     BASE = "../scans/"
-    title = BASE + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    # title = BASE + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    title = BASE + "scan.json"
 
     out_dict["Scan_End"] = str(datetime.datetime.now())
     out_json = json.dumps(out_dict)
@@ -98,7 +101,7 @@ def outputToFile(out_dict):
     except FileExistsError:
         print("Folder already exists.")
 
-    f = open("{}.txt".format(title), "w")
+    f = open(title, "w")
     f.write(out_json)
 
     return
