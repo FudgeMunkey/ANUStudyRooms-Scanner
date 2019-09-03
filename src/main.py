@@ -6,6 +6,7 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import time
 import json
 import os
 
@@ -34,8 +35,8 @@ def createParamLogin():
 
     split = contents.split(':')
 
-    loginParams = {"inp_uid": split[0],
-                   "inp_passwd": split[1]}
+    loginParams = {"inp_uid": split[0].strip(),
+                   "inp_passwd": split[1].strip()}
 
     return loginParams
 
@@ -88,7 +89,7 @@ def cleanTimes(tList):
 
 
 def outputToFile(out_dict):
-    BASE = "../scans/"
+    BASE = "/var/www/html/"
     # title = BASE + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     title = BASE + "scan.json"
 
