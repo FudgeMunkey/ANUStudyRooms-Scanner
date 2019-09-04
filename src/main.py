@@ -14,7 +14,7 @@ CRED_PATH = "../secrets/credentials.txt"
 URL = "https://library-admin.anu.edu.au/book-a-library-group-study-room/index.html"
 
 BUILDINGS = ["Chifley", "Hancock", "Law", "Menzies"]
-DAYS_TO_SCAN = 2
+DAYS_TO_SCAN = 7
 
 PARAMS_BOOKINGS = {"ajax": 1,
                    "building": "Hancock",
