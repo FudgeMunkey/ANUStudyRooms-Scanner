@@ -11,7 +11,7 @@ while true
 do
     OUTPUT="$(python3 main.py)"
     echo "${OUTPUT}"
-    sleep 1800
+    sleep 900
 done
 
 
