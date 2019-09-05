@@ -3,4 +3,7 @@ services:
   scanner:
     image: anusr-scanner-image
     container_name: anusr-scanner-container
-
+networks:
+  default:
+    external:
+      name: shared
