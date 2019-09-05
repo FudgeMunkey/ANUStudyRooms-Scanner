@@ -1,13 +1,6 @@
 version: "3"
 services:
-  nginx:
+  scanner:
     image: anusr-scanner-image
     container_name: anusr-scanner-container
-    networks:
-      static-network:
-        ipv4_address: 172.18.0.20
-networks:
-  static-network:
-    ipam:
-      config:
-        - subnet: 172.18.0.0/16
+
