@@ -6,9 +6,10 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
-import time
 import json
 import os
+
+ON_PRODUCTION = True
 
 CRED_PATH = "../secrets/credentials.txt"
 URL = "https://library-admin.anu.edu.au/book-a-library-group-study-room/index.html"
@@ -89,11 +90,17 @@ def cleanTimes(tList):
 
 
 def outputToFile(out_dict):
-    BASE = "/var/www/html/"
+
+    if ON_PRODUCTION:
+        BASE = "/var/www/html/"
+    else:
+        BASE = "../scans/"
+
     # title = BASE + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     title = BASE + "scan.json"
 
     out_dict["Scan_End"] = str(datetime.datetime.now())
+    print("Scanning Finished: {}".format(out_dict["Scan_End"]))
     out_json = json.dumps(out_dict)
 
     try:
@@ -112,6 +119,7 @@ if __name__ == "__main__":
     # Create the output file
     out = {}
     out["Scan_Start"] = str(datetime.datetime.now())
+    print("Scanning at: {}".format(out["Scan_Start"]))
 
     # Create the session
     s = requests.Session()
