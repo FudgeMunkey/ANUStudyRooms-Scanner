@@ -15,7 +15,7 @@ CRED_PATH = "../secrets/credentials.txt"
 URL = "https://library-admin.anu.edu.au/book-a-library-group-study-room/index.html"
 
 BUILDINGS = ["Chifley", "Hancock", "Law", "Menzies"]
-DAYS_TO_SCAN = 7
+DAYS_TO_SCAN = 2
 
 PARAMS_BOOKINGS = {"ajax": 1,
                    "building": "Hancock",
@@ -71,10 +71,23 @@ def generateDates(num_days):
 def cleanTimes(tList):
     cleaned = []
 
+    # Deal with issues where the same booking is listed twice
+    booking_start = []
+
     for tb in tList:
         split = tb.split(" - ")
         start = split[0]
         end = split[1]
+
+        # Check if the ending time is after 00:00
+        if start[1] == "2" or start[1] == "3":
+            if end[1] == "0" or end[1] == "1" or end[1] == "2":
+                end = "24:00"
+
+        if start in booking_start:
+            continue
+
+        booking_start.append(start)
 
         if start not in cleaned:
             cleaned.append(start)
@@ -85,6 +98,8 @@ def cleanTimes(tList):
             cleaned.append(end)
         else:
             cleaned.remove(end)
+
+    print(cleaned)
 
     return cleaned
 
@@ -134,7 +149,7 @@ if __name__ == "__main__":
 
         dateDict = {}
         for d in dates:
-            # print("Date {}".format(d))
+            print("Date {}".format(d))
             dateDict[d] = {}
             
             # Generate the POST Parameters
