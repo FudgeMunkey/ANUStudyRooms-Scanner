@@ -172,7 +172,8 @@ if __name__ == "__main__":
                 timeElements = e.find_all(class_="xideboard")
                 timeList = []
                 for te in timeElements:
-                    timeBlock = te.text.split(':', 1)[1][1:-1]
+                    splits = te.text.split(' ')
+                    timeBlock = f"{splits[-4]} - {splits[-2]}"
                     timeList.append(timeBlock)
 
                 clean = cleanTimes(timeList)
